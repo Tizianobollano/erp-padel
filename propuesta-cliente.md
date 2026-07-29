@@ -150,7 +150,7 @@ Sin costo de instalacion. Sin comision por turno. Sin costo por usuario.
   cobrar puesta en marcha.
 * Los precios se ajustan una vez por ano, avisando con 30 dias.
 
-**Adicionales opcionales** (solo si el club los pide):
+**Adicionales opcionales**:
 
 | Adicional | Precio | Nota |
 |---|---|---|
@@ -187,25 +187,3 @@ baja; si el club quiere impresora de tickets, se conecta la que ya tenga.
 
 **Soporte incluido**: WhatsApp directo, en la ventana horaria en que el club factura. Respuesta
 comprometida por escrito, con prioridad maxima si la grilla o la caja estan caidas.
-
-## Fuentes
-
-El apartado "Que nos diferencia" y el diseno de planes surgen de un relevamiento de la oferta
-disponible para clubes deportivos en Argentina, sobre informacion publica de los proveedores:
-
-* Clubo - https://www.clubo.com.ar/
-* CanchaFija - https://canchafija.com.ar/
-* PadelCRM - https://padelcrm.com/
-
-Servicios de terceros mencionados en el documento, con sus condiciones propias:
-
-* Mercado Pago (Checkout Pro) - cobro de senas e inscripciones; comisiones de la pasarela a cargo
-  del club.
-* WhatsApp Business API (Meta) - requisito del adicional de mensajeria automatica; alta y costo
-  por mensaje a nombre del club.
-* ARCA - facturacion electronica via intermediario habilitado; requiere CUIT, punto de venta y
-  delegacion del club.
-
-Nota de alcance: el relevamiento se hizo sobre informacion publicada por cada proveedor y puede
-haber cambiado. Las condiciones comerciales de terceros (pasarela, Meta, ARCA) las fija cada
-proveedor y no dependen de nosotros.
