@@ -2,29 +2,7 @@
 
 Turnos - Torneos - Caja y contabilidad - Precio por demanda
 
-Documento de propuesta - version 2026-07-29
-
----
-
-## El problema
-
-Un club de padel factura por hora de cancha, pero se administra con herramientas que no
-registran nada: la grilla en un cuaderno o un grupo de WhatsApp, la caja en una planilla, la
-cantina aparte, el torneo en otra planilla mas. La informacion existe, pero esta partida en
-lugares que no se cruzan.
-
-| Problema | Consecuencia |
-|---|---|
-| La grilla no es un dato | Sobreventa de horarios, turnos regalados sin registro y ninguna forma de saber que franjas rinden y cuales no |
-| El jugador depende de que alguien conteste | Reservas que se pierden fuera del horario de mostrador y turnos que se caen sin sena |
-| Caja diaria sin cierre contable | Se sabe cuanto entro hoy; no se sabe cual fue el resultado del mes ni cuanto deja realmente la cantina |
-| Sin trazabilidad de anulaciones | Un faltante de caja se discute de memoria, sin poder reconstruir quien anulo que y cuando |
-| El torneo vive fuera del sistema | Inscripciones, cuadros y gastos del evento no llegan nunca a los numeros del club |
-| El precio no acompana a la demanda | La franja de las 21 se llena siempre y la de las 15 no se llena nunca, y las dos se cobran segun una tabla que se actualiza cada varios meses |
-
-## Que resuelve el sistema
-
-Cuatro areas en una sola base de datos, sin exportar entre planillas.
+Documento de propuesta - 2026-07-29
 
 ### Modulo 1 - Turnos
 
@@ -118,21 +96,6 @@ costo lo que costo.
 
 *Instalacion: sin cargo*
 
-## Que nos diferencia
-
-| | Sistemas actuales del mercado | Este sistema |
-|---|---|---|
-| Contabilidad | Caja diaria y punto de venta | Ingresos por origen, egresos, margen de cantina, resultado del periodo |
-| Auditoria | Parcial o ausente | Registro inmutable de toda anulacion, ajuste y cambio de precio |
-| Datos del club | Dentro del SaaS del proveedor | Base propia del club, exportable completa cuando quiera |
-| Precio de la cancha | Tarifa fija por franja, cargada a mano | Precio por demanda con bandas del club, simulable contra su propio historico |
-| Comision por turno | No cobran | No cobramos |
-| Estructura de precio | Escala por cancha activa | Plan por club, no por cancha |
-| Pedidos del club | Cola de un producto masivo | Entran al roadmap de un producto con pocos clubes |
-
-El punto de fondo: no es un SaaS al que el club se sube, es un sistema del club. La base de datos
-es del club, el respaldo es del club y la exportacion completa esta siempre disponible. Si algun
-dia deja de trabajar con nosotros, se va con sus datos, no con un PDF.
 
 ## Planes
 
@@ -149,41 +112,3 @@ Sin costo de instalacion. Sin comision por turno. Sin costo por usuario.
 * Compromiso minimo de 12 meses en el plan mensual, o preaviso de baja. Es la contrapartida de no
   cobrar puesta en marcha.
 * Los precios se ajustan una vez por ano, avisando con 30 dias.
-
-**Adicionales opcionales**:
-
-| Adicional | Precio | Nota |
-|---|---|---|
-| Modulo 4 - Precio por demanda | $-.---/mes | Sobre plan Club. Necesita al menos 8 semanas de historico de turnos en el sistema; hasta entonces funciona en modo simulacion, sin cargo |
-| WhatsApp automatico (recordatorios y deudas) | $-.---/mes | Requiere cuenta de WhatsApp Business API a nombre del club y plantillas aprobadas por Meta; el costo por mensaje de Meta va aparte |
-| Facturacion electronica ARCA | $-.---/mes | Via intermediario habilitado; requiere CUIT, punto de venta y delegacion del club |
-| Migracion de historico | A presupuestar | Cargar turnos, jugadores y stock desde planillas existentes |
-| Capacitacion presencial en el club | A presupuestar | La capacitacion remota esta incluida |
-
-Las comisiones de la pasarela de pago (Mercado Pago) cuando el jugador sena el turno online son
-del club y no forman parte de este presupuesto.
-
-**Programa socio fundador** (primeros clubes): bonificacion sobre el plan Club durante los
-primeros meses. A cambio: reuniones de feedback cada dos semanas, tolerancia a errores del primer
-periodo y autorizacion para usar al club como caso de referencia.
-
-*Valores de cada plan en la propuesta economica que acompana este documento.*
-
-## Puesta en marcha
-
-Sin cargo, y con plazo comprometido: 5 dias.
-
-1. **Dia 1** - Relevamiento: canchas, franjas, tarifas, productos de cantina, empleados y permisos.
-2. **Dia 2 y 3** - Configuracion del club en el sistema, carga de tarifas y productos, sitio de
-   reservas con la marca del club.
-3. **Dia 4** - Capacitacion remota: mostrador (1 hora) y administracion (1 hora). Queda grabada.
-4. **Dia 5** - Salida en vivo acompanada, con nosotros disponibles en el horario de mayor
-   movimiento.
-5. **Primeras 2 semanas** - Ajustes de configuracion sin cargo.
-
-No hace falta comprar hardware. Funciona en el celular del encargado, en cualquier tablet Android
-o iPad, y en la computadora del mostrador si ya existe. Para la cantina alcanza una tablet de gama
-baja; si el club quiere impresora de tickets, se conecta la que ya tenga.
-
-**Soporte incluido**: WhatsApp directo, en la ventana horaria en que el club factura. Respuesta
-comprometida por escrito, con prioridad maxima si la grilla o la caja estan caidas.
