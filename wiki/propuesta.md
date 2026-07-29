@@ -1,6 +1,6 @@
 # Propuesta - Sistema de gestion para clubes de padel
 
-Turnos - Torneos - Caja y contabilidad
+Turnos - Torneos - Caja y contabilidad - Precio por demanda
 Producto enlatado NORMAI, desplegable por club. Nombre comercial: a definir.
 Version: 2026-07-29 (borrador 1, sin revisar con ningun club)
 
@@ -33,7 +33,7 @@ Consecuencias directas para nosotros:
 
 ## Que resuelve el sistema
 
-Tres areas en una sola base de datos, sin exportar entre planillas.
+Cuatro areas en una sola base de datos, sin exportar entre planillas.
 
 ### Modulo 1 - Turnos
 
@@ -85,6 +85,45 @@ falta es el cierre contable.
   cambios de precio quedan con autor, fecha y valor anterior. Es lo que permite explicar un
   faltante de caja sin discutir de memoria.
 
+### Modulo 4 - Precio por demanda
+
+El precio de la cancha hoy es una tabla fija que el club revisa cada varios meses. La franja de
+las 21 se llena siempre y la de las 15 no se llena nunca, y las dos se cobran como se cobraban en
+la ultima actualizacion. Este modulo convierte esa tabla en un precio que sigue a la demanda real
+del club, dentro de limites que el club fija.
+
+- **Bandas por franja**: el club define precio piso y precio techo por cancha y rango horario. El
+  sistema nunca cotiza fuera de la banda. Es el control que hace aceptable la automatizacion.
+- **Algoritmo de ajuste**, con senales que salen de la propia operacion del club:
+  1. Ocupacion historica de esa franja (ultimas 8 a 12 semanas, con mas peso a lo reciente).
+  2. Ocupacion actual del dia a medida que se acerca: cuantas canchas quedan libres y cuanto falta.
+  3. Anticipacion de la reserva: la misma franja no vale lo mismo reservada con 10 dias que a
+     3 horas del partido.
+  4. Calendario: feriados, vacaciones, cierres, eventos y torneos del club.
+  5. Tasa de no-show y cancelacion de la franja (una franja que se cae seguido no soporta recargo).
+- **Dos direcciones, no solo recargo**: sube en pico y baja en valle. La baja de ultimo momento en
+  franjas historicamente vacias es la que agrega facturacion nueva, porque una hora sin vender no
+  se recupera.
+- **Modo sugerencia y modo automatico**: arranca sugiriendo (el club acepta o rechaza cada cambio,
+  y el sistema aprende de esos rechazos como limite). Cuando el club confia, pasa a automatico.
+  Nunca al reves por defecto.
+- **Simulacion antes de activar**: el modulo corre el algoritmo sobre el historico ya cargado y
+  muestra que habria facturado el club con esas reglas. Sin esa pantalla, esto no se vende.
+- **Reglas duras del club por encima del algoritmo**: precio fijo para abonados y turnos fijos,
+  franjas excluidas (escuelita, torneo), tope de variacion por semana, y precio congelado para una
+  reserva ya confirmada (el precio se sella al reservar, nunca se recotiza hacia arriba).
+- **Un solo precio para el jugador**: el sitio de reservas muestra el precio vigente, sin precio
+  tachado ni contador de urgencia. Opcionalmente, aviso de "precio promocional" cuando el ajuste
+  es a la baja.
+- **Auditoria y medicion**: cada recalculo queda en el registro de auditoria con valor anterior,
+  valor nuevo y regla que lo genero. El informe del modulo compara ingreso por cancha-hora contra
+  el periodo previo, que es la unica metrica que decide si el modulo se paga solo.
+
+Implementacion: reglas explicitas y explicables, no un modelo entrenado. El club tiene que poder
+entender por que una hora subio, y nosotros tenemos que poder defenderlo en una reunion. Un
+modelo estadistico sobre datos propios del club es una segunda etapa, y recien con historico
+suficiente.
+
 ## Que nos diferencia
 
 | | Sistemas actuales | Este sistema |
@@ -92,6 +131,7 @@ falta es el cierre contable.
 | Contabilidad | Caja diaria y punto de venta | Ingresos por origen, egresos, margen de cantina, resultado del periodo |
 | Auditoria | Parcial o ausente | Registro inmutable de toda anulacion, ajuste y cambio de precio |
 | Datos del club | Dentro del SaaS del proveedor | Base propia del club, exportable completa cuando quiera |
+| Precio de la cancha | Tarifa fija por franja, cargada a mano | Precio por demanda con bandas del club, simulable contra su propio historico |
 | Comision por turno | No cobran | No cobramos |
 | Precio con 4+ canchas | Escala por cancha (Clubo: $60.000) | Plan por club, no por cancha |
 | Pedidos del club | Cola de un producto masivo | Entran al roadmap de un producto con pocos clubes |
@@ -120,6 +160,7 @@ Sin costo de instalacion. Sin comision por turno. Sin costo por usuario.
 
 | Adicional | Precio | Nota |
 |---|---|---|
+| Modulo 4 - Precio por demanda | $9.000/mes | Solo sobre plan Club. Requiere al menos 8 semanas de historico de turnos cargado en el sistema; hasta entonces corre en modo simulacion sin cobro |
 | WhatsApp automatico (recordatorios y deudas) | $8.000/mes | Requiere cuenta de WhatsApp Business API a nombre del club y plantillas aprobadas por Meta; el costo por mensaje de Meta va aparte |
 | Facturacion electronica ARCA | $6.000/mes | Via intermediario habilitado; requiere CUIT, punto de venta y delegacion del club |
 | Migracion de historico | Presupuesto unico | Cargar turnos, jugadores y stock desde planillas existentes |
@@ -168,6 +209,11 @@ Costo marginal por club, mensual (estimado):
 | Total en pesos | ~$3.000 a $8.000 equivalente |
 
 Con plan Club a $34.000 y costo marginal de ~$4.000, la contribucion por club es ~$30.000/mes.
+Con el Modulo 4 el ticket sube a $43.000, que es lo mas cerca del techo de mercado (~$45.000) a lo
+que se puede llegar sin salir de la comparacion. Su costo marginal es ~0 (un cron por club sobre
+datos que ya estan en la base), asi que casi todo el adicional es contribucion. Es la palanca mas
+barata que tenemos para mejorar el recupero sin sumar clubes; el limite no es tecnico, es cuantos
+clubes lo compran.
 
 Meses hasta recuperar la construccion, segun cuanto se valore construirla y cuantos clubes se
 consigan:
@@ -218,6 +264,12 @@ dato, simplicidad, modularidad).
 - **Auditoria**: tabla `auditoria` append-only para toda escritura sensible (anulacion de venta,
   cambio de precio, ajuste de stock, cancelacion o regalo de turno, cierre de caja con diferencia).
   Sin borrado ni actualizacion, con autor, timestamp e IP.
+- **Precio por demanda (Modulo 4)**: Cron Trigger diario por club que recalcula el precio sugerido
+  de cada franja de la ventana de reserva abierta, leyendo el historico de `reservas` que ya esta
+  en la base. Reglas en tabla, no en codigo: cada club puede tener pesos distintos sin desplegar.
+  El precio se sella en la reserva al confirmarla (columna propia, no lookup a la tarifa vigente),
+  y todo recalculo pasa por `auditoria`. Sin servicio externo, sin modelo entrenado, sin dato de
+  terceros: el algoritmo corre sobre la operacion del propio club.
 - **Sin Durable Objects, sin Queues, sin LangGraph.** La grilla no necesita coordinacion en tiempo
   real: la colision de dos reservas simultaneas se resuelve con una restriccion unica en la base
   (cancha + fecha + franja) y el segundo intento recibe el error. Es la solucion mas simple que
@@ -226,6 +278,8 @@ dato, simplicidad, modularidad).
 Entidades principales (borrador, a validar con database-architect):
 
 - `canchas`, `franjas_horarias`, `tarifas` (por cancha, dia de semana y rango horario)
+- `precio_bandas` (piso y techo por cancha y franja), `precio_reglas` (senales y pesos por club),
+  `precio_sugerencias` (valor calculado, regla que lo genero, aceptado o rechazado por el club)
 - `jugadores`, `abonos` (turno fijo recurrente)
 - `reservas` con estado explicito + `reservas_transiciones`
 - `torneos`, `categorias`, `inscripciones`, `zonas`, `partidos`, `ranking_puntos`
@@ -248,6 +302,10 @@ Entidades principales (borrador, a validar con database-architect):
    y vender Torneos como la segunda etapa. La segunda opcion adelanta ingreso pero compite peor
    contra PadelCRM, que ya tiene torneos.
 4. **Ventana de soporte** comprometida (ver riesgo economico arriba).
+5. **Empaquetado del Modulo 4**: adicional de $9.000 sobre plan Club (deja el ticket en $43.000,
+   al filo del techo) o un tercer plan que lo incluya. El adicional se vende mejor porque se
+   justifica con el informe de ingreso por cancha-hora; el plan sube el ticket base pero mete
+   precio por demanda en la comparacion inicial contra Clubo y CanchaFija, que no lo tienen.
 
 ## Riesgos
 
@@ -260,6 +318,9 @@ Entidades principales (borrador, a validar con database-architect):
 | ARCA / facturacion | Riesgo fiscal, no tecnico | Fuera del producto base; intermediario hosteado como adicional |
 | WhatsApp automatico | Tramite Meta desproporcionado para el ticket | Base con `wa.me`; WABA solo como adicional pagado y a nombre del club |
 | Un solo club decide el diseno | El enlatado se contamina con el caso particular | Todo lo especifico del club vive en configuracion, no en codigo |
+| Precio por demanda mal recibido por el jugador | El habitue percibe arbitrariedad y se va al club de al lado | Bandas del club, precio sellado al reservar, sin precio tachado ni urgencia falsa, y comunicacion como promocion en valle antes que como recargo en pico |
+| Precio por demanda sin historico | El algoritmo decide con 3 semanas de datos y recomienda cualquier cosa | Modo simulacion obligatorio hasta 8 semanas de historico; sin cobro del modulo en ese periodo |
+| Efecto del Modulo 4 no demostrable | Se cobra un adicional que el club no puede justificar | Informe de ingreso por cancha-hora contra periodo previo; si no mejora, el club lo da de baja |
 
 ## Plan de construccion por oleadas
 
@@ -275,7 +336,12 @@ celular). Nada pasa a produccion sin confirmacion humana.
 | 4 | Sitio publico de reservas + sena con Mercado Pago | Autogestion del jugador |
 | 5 | Torneos: inscripcion, categorias, fixture, resultados, ranking | Plan Club completo |
 | 6 | Informes, exportacion completa, respaldo descargable por el club | Argumento de soberania del dato cumplido |
-| 7 | Replicacion: alta de un club nuevo como procedimiento, no como proyecto | Escala comercial |
+| 7 | Precio por demanda: bandas, reglas, cron de recalculo, simulador y modo sugerencia | Modulo 4 vendible |
+| 8 | Replicacion: alta de un club nuevo como procedimiento, no como proyecto | Escala comercial |
 
-Estimacion: oleadas 0 a 4 son el producto vendible minimo. Las 5 a 7 completan el plan Club y la
-capacidad de replicar.
+Estimacion: oleadas 0 a 4 son el producto vendible minimo. Las 5 a 6 completan el plan Club, la 7
+habilita el adicional de mayor margen y la 8 la capacidad de replicar.
+
+El Modulo 4 va despues de la 6 y no antes por una razon de datos, no de esfuerzo: el algoritmo se
+alimenta del historico de reservas del propio club, que no existe hasta que el club opero varios
+meses sobre la oleada 1. Construirlo antes seria construirlo a ciegas.

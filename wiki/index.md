@@ -1,12 +1,13 @@
 # Wiki - erp-padel
 # Mantenido por el agente. Modificaciones humanas: agregar bajo ## Inbox.
-# Ultima actualizacion: 2026-07-29 (creacion del proyecto + propuesta borrador 1 + repo propio)
+# Ultima actualizacion: 2026-07-29 (creacion del proyecto + propuesta borrador 2 con Modulo 4 +
+# entregable para cliente + repo propio)
 
 ## Que es
 
-Producto enlatado de gestion para clubes de padel, desplegable por club: turnos, torneos y
-contabilidad en una sola base. Compite contra Clubo, CanchaFija y PadelCRM, que cobran suscripcion
-mensual fija sin comision por partido.
+Producto enlatado de gestion para clubes de padel, desplegable por club: turnos, torneos,
+contabilidad y precio por demanda en una sola base. Compite contra Clubo, CanchaFija y PadelCRM,
+que cobran suscripcion mensual fija sin comision por partido.
 
 **Estado: idea con propuesta escrita. Sin cliente, sin repo, sin codigo.** No se construye nada
 hasta resolver las decisiones pendientes de la propuesta (Parte 2) y tener 2 clubes comprometidos.
@@ -24,7 +25,8 @@ hasta resolver las decisiones pendientes de la propuesta (Parte 2) y tener 2 clu
 
 | Archivo | Que contiene |
 |---|---|
-| [propuesta.md](./propuesta.md) | Parte 1: propuesta comercial (modulos, precios, puesta en marcha). Parte 2: anexo interno (economia del modelo sin instalacion, arquitectura, decisiones pendientes, riesgos, plan de oleadas) |
+| [propuesta.md](./propuesta.md) | Documento maestro, uso interno. Parte 1: propuesta comercial (4 modulos, precios, puesta en marcha). Parte 2: anexo interno (economia del modelo sin instalacion, arquitectura, decisiones pendientes, riesgos, plan de oleadas) |
+| [../propuesta-cliente.md](../propuesta-cliente.md) | Entregable para enviar al club: Parte 1 sin valores, con seccion de fuentes del relevamiento de mercado. Sin anexo interno. Derivado de propuesta.md; si cambia el maestro, hay que regenerarlo |
 
 ## Restriccion comercial que define el producto
 
@@ -70,13 +72,21 @@ Detalle y opciones en propuesta.md Parte 2:
 2. Nombre comercial y marca del producto
 3. Alcance del piloto: 3 modulos completos, o Turnos + Caja primero
 4. Ventana de soporte comprometida (el riesgo economico principal, no el precio)
+5. Empaquetado del Modulo 4 (precio por demanda): adicional sobre plan Club, o tercer plan que lo
+   incluya
 
 ## Gaps
 
 - [ ] Ningun club validado: precios, modulos y prioridades salen de la investigacion de mercado, no
       de una conversacion con un club
-- [ ] Precios de la competencia sin verificar de primera mano (provistos como investigacion, no
-      consultados en las webs)
+- [ ] Precios de la competencia sin verificar de primera mano: los sitios de Clubo
+      (clubo.com.ar), CanchaFija (canchafija.com.ar) y PadelCRM (padelcrm.com) estan citados como
+      fuente en el entregable, pero los valores de la tabla de mercado siguen siendo los de la
+      investigacion provista, no lecturas directas de esas paginas
+- [ ] Modulo 4 sin validar con ningun club: no sabemos si un club argentino acepta precio variable
+      ni si el habitue lo tolera. Es la parte mas nueva de la propuesta y la menos respaldada
+- [ ] Efecto economico del Modulo 4 sin cuantificar: no hay estimacion de cuanto sube el ingreso
+      por cancha-hora, solo el mecanismo para medirlo despues
 - [ ] Inversion de construccion sin estimar en horas: la tabla de recupero usa tres escenarios
       hipoteticos
 - [ ] Modelo de datos en borrador, sin pasar por database-architect
