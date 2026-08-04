@@ -1,0 +1,4 @@
+# Archivos gitignoreados que igual deben viajar a cada worktree nuevo.
+# Sintaxis .gitignore. Solo copia lo que ademas este gitignoreado.
+**/.dev.vars
+**/.dev.vars.*
