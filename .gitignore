@@ -3,5 +3,12 @@ node_modules/
 .dev.vars
 .claude/agent-memory/
 
+# Build generado (se regenera con `npm run build:css` en cada maquina)
+public/styles.css
+
 # worktrees de Claude Code (aislamiento de trabajo en curso)
 .claude/worktrees/
+
+# cache/artefactos de herramientas de agente (no son parte del proyecto)
+.impeccable/
+.playwright-mcp/

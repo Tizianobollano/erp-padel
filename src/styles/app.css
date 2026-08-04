@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+/* Indica a Tailwind dónde buscar clases (SSR con Hono/JSX). */
+@source "../**/*.{ts,tsx}";
+
+/* ───────────────────────────────────────────────────────────────
+   DESIGN TOKENS  (Tailwind v4 — @theme)
+   Cada token genera utilidades automáticamente:
+     --color-accent → bg-accent / text-accent / border-accent ...
+     --radius-md    → rounded-md
+     --shadow-card  → shadow-card
+   Para re-tematizar el framework, redefiní SOLO los roles semanticos.
+   ─────────────────────────────────────────────────────────────── */
+@theme {
+  /* design.md seccion 3: prohibido Inter como default de proyecto. Pila de sistema, sin
+     @font-face -- erp-padel no tiene marca propia y prioriza carga cero en el celular. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ─── CONTRATO DE ROLES SEMANTICOS ──────────────────────────────
+     Retematizar = redefinir SOLO estos roles. El markup nunca usa
+     nombres de marca. Default = paleta AFOLAP.
+     PENDIENTE: paleta propia IIAPIE (ver framework-backlog.md).
+     ─────────────────────────────────────────────────────────────── */
+
+  /* Superficies claras (base -> elevada) */
+  --color-surface-1: #ffffff; /* base de pagina */
+  --color-surface-2: #eeecde; /* superficie calida alterna */
+  --color-surface-3: #f5f3e8; /* superficie elevada suave */
+
+  /* Superficies oscuras / inversion */
+  --color-surface-dark: #237b7c; /* superficie oscura primaria */
+  --color-surface-dark-2: #467b76; /* superficie oscura alterna */
+  --color-surface-ink: #131313; /* casi negro / scrim */
+
+  /* Texto (3 niveles + sobre oscuro) */
+  --color-ink: #131313; /* texto primario */
+  --color-ink-muted: #282828; /* texto secundario */
+  --color-ink-subtle: #467b76; /* texto terciario */
+  --color-on-dark: #eeecde; /* texto/icono sobre superficie oscura */
+
+  /* Bordes / hairlines neutros (datos/consola) */
+  --color-hairline: rgba(19, 19, 19, 0.1);
+  --color-hairline-strong: rgba(19, 19, 19, 0.18);
+
+  /* Acento */
+  --color-accent: #237b7c;
+  --color-accent-hover: #467b76;
+  --color-accent-tint: #89bab4;
+
+  /* Semanticos de estado */
+  --color-success: #5ee0a0;
+  --color-danger: #dc4c4c;
+  --color-warning: #e0a34f;
+  --color-info: #4f93e0;
+
+  /* Marca puntual */
+  --color-whatsapp: #25d366;
+
+  /* Radios */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Sombras */
+  --shadow-card: 0 2px 12px rgba(35, 123, 124, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 8px 32px rgba(35, 123, 124, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  /* Motion — Tailwind v4 genera utilidades animate-* (usar bajo motion-safe:) */
+  --animate-fade-in: fade-in 0.5s ease-out both;
+  --animate-fade-up: fade-up 0.6s ease-out both;
+  --animate-scale-in: scale-in 0.35s ease-out both;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-surface-1);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  img {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* ── Helpers de iconos SVG (sprite) ───────────────────────────── */
+@layer components {
+  /* Lucide-style (stroke), tamaño controlado por font-size vía 1em */
+  .icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  /* Simple Icons-style (fill, ej. logos de redes) */
+  .icon-fill {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    stroke: none;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Area de toque del boton "Cerrar" del Modal (design.md seccion 7, hallazgo ux-reviewer) ──
+   El Modal del framework (app/overlays.tsx) no expone una prop de clase para el boton
+   data-overlay-close del header: mide 17x24px, bajo el minimo 44x44px de PRODUCT.md seccion 7.
+   Fix scoped a este proyecto (sin forkear Modal) via el id del overlay de este modulo -- ver
+   framework-backlog.md, gap generico de Modal/Drawer en mobile. */
+[data-overlay="cancelar-reserva"] header button {
+  min-width: 2.75rem; /* 44px */
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Motion: reveal-on-scroll ─────────────────────────────────────
+   Convencion [data-reveal]: <ClientScript> agrega la clase `js` al
+   <html> y, via IntersectionObserver, el atributo [data-revealed]
+   cuando el elemento entra en viewport. La animacion vive en CSS.
+   Degradacion: sin JS no hay clase `js` -> el contenido queda visible.
+   Accesibilidad: todo el efecto esta detras de prefers-reduced-motion.
+   ───────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .js [data-reveal][data-revealed] {
+    opacity: 1;
+    transform: none;
+  }
+}
