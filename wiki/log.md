@@ -44,3 +44,46 @@ que el club opero meses sobre la oleada 1.
 del repo normai, como el resto de projects/, que esta gitignored). Remoto en GitHub pendiente: no
 hay `gh` instalado en esta maquina, asi que la creacion del repositorio remoto y el primer push
 quedan a cargo del humano.
+
+[2026-08-04] Reconciliacion de inicio de sesion (paso 6 del protocolo): MISMATCH detectado entre
+wiki y estado real. index.md decia "sin repo" / "remoto pendiente de crear", pero `git remote -v`
+muestra origin ya apuntando a git@github.com:Tizianobollano/erp-padel.git y `git status` confirma
+la rama al dia con origin/main (6 commits, incluido uno de habilitacion de worktrees). El humano
+creo el remoto y pusheo a mano en algun momento posterior al 2026-07-29 sin que quedara registrado
+en la wiki. Reportado como MISMATCH y confirmado por el humano antes de corregir; index.md
+actualizado. Tambien se deja registrado: arranca una corrida end-to-end del Modulo 1 (Reserva de
+cancha) como implementacion de referencia para ejercitar la suite de agentes, confirmada por el
+humano como excepcion tecnica a la regla de "2 clubes comprometidos" (no es un compromiso
+comercial).
+
+[2026-08-04] ADR-0001 (software-architect): resuelta la decision pendiente 1 (modelo de cuentas
+Cloudflare para producto de ticket bajo). Cuenta CF compartida con Workers for Platforms (dispatch
+namespace, un User Worker por club con su D1 adjuntada por binding), no una cuenta por club.
+Matiza ADR-0006 global (una cuenta por cliente) para el caso de erp-padel: producto enlatado
+multi-tenant de UN mismo codigo, exactamente la excepcion que el propio ADR-0006 nombra y descarta
+para su caso (bespoke). Verificado en cloudflare-docs MCP: W4P soporta bindings D1/KV/R2 aislados
+por User Worker, es la arquitectura de referencia de Cloudflare para este patron, y los scripts de
+un namespace no cuentan contra el limite de "Number of Workers" de la cuenta (lo que descarta el
+modelo alternativo `--env <club>` sobre cuenta compartida). Gap dejado abierto: costo mensual
+propio de W4P mas alla del Workers Paid $5/mes, no encontrado en la documentacion consultada;
+devops debe confirmarlo en el dashboard. Detalle completo en
+decisions/0001-modelo-cuentas-cloudflare-multi-club.md. Cascada aplicada: propuesta.md
+(arquitectura + decision pendiente 1 marcada resuelta) e index.md (decision movida de pendientes a
+tomadas) actualizados en la misma sesion.
+
+[2026-08-04] Cierre de la corrida e2e del Modulo 1 (Reserva de cancha). Cadena completa:
+software-architect -> database-architect -> api-developer -> design-lead -> frontend-developer ->
+qa-engineer (SHIP CON FIXES, blocker de auth encontrado y arreglado) -> security-reviewer (blocker
+confirmado y cerrado, 2 warnings abiertos) -> ux-reviewer (NO listo -> ronda de fixes de
+accesibilidad con design-lead y frontend-developer -> re-auditoria: LISTO PARA STAGING) ->
+devops (plan de staging, sin ejecutar nada contra la cuenta CF real -- confirmado con el humano
+antes de invocarlo). Hallazgo no anticipado de devops: Workers for Platforms (ADR-0001) no esta
+comprado en la cuenta CF real, bloqueando la ejecucion del plan hasta que el humano lo habilite en
+el dashboard. Desviacion de proceso a documentar: parte del fix pass de UX se completo fuera de
+esta sesion (otra cuenta, tras corte por limite de sesion) y genero 4 commits locales en la rama
+del worktree sin pasar por el flujo de confirmacion humana de CLAUDE.md; no se revirtieron, se
+verificaron (tsc limpio, diff completo revisado, log del worktree leido). Auditoria completa,
+orden de agentes, entregables, friccion y tiempos reales: corrida-e2e.md. Codigo, schema, specs y
+plan de staging quedan en `.claude/worktrees/reserva-cancha` (rama `worktree-reserva-cancha`), sin
+mergear a main, sin pushear. Commit de esta sesion en el checkout principal (reconciliacion +
+ADR-0001 + cierre) preparado y pendiente de confirmacion humana, no ejecutado.

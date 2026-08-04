@@ -250,7 +250,9 @@ dato, simplicidad, modularidad).
   la categoria app/ ya construida (AppShell, DataTable, KpiTile, Drawer, Modal, FilterBar). El
   sitio publico de reservas usa las secciones de landing.
 - **DB**: D1 (SQLite) por club, aislada. Sin base compartida entre clubes: el aislamiento es
-  fisico, no un campo `club_id` en un WHERE.
+  fisico, no un campo `club_id` en un WHERE. Desplegada sobre Workers for Platforms (dispatch
+  namespace, cuenta CF compartida, un User Worker por club con su D1 adjuntada por binding) --
+  ver decisiones/0001-modelo-cuentas-cloudflare-multi-club.md.
 - **KV**: configuracion de tarifas cacheada y rate limit del formulario publico de reservas.
 - **R2**: exportaciones (CSV/Excel) y respaldos que el club puede descargar.
 - **Auth**: dos niveles. Personal del club por sistema propio de usuarios con roles
@@ -290,13 +292,11 @@ Entidades principales (borrador, a validar con database-architect):
 
 ## Decisiones pendientes (requieren ADR antes de construir)
 
-1. **Modelo de cuentas Cloudflare para un producto de ticket bajo.** El ADR-0006 global fijo "una
-   cuenta Cloudflare por cliente en produccion", pensado para clientes con desarrollo a medida. Con
-   clubes de padel a $34.000/mes, USD 5 por cuenta por mes es tolerable pero la carga operativa de
-   N cuentas no lo es. Opciones: (a) cuenta compartida NORMAI con Worker y D1 aislados por club via
-   `--env <club>` (modelo finz), (b) una cuenta por club como manda el ADR-0006, (c) cuenta
-   compartida ahora y migracion a Tenant/Partners Platform al cruzar ~8 clubes. Hay que decidirlo y
-   registrarlo, porque contradice o matiza un ADR vigente.
+1. ~~Modelo de cuentas Cloudflare para un producto de ticket bajo.~~ **Resuelta**, ver
+   [decisiones/0001-modelo-cuentas-cloudflare-multi-club.md](./decisions/0001-modelo-cuentas-cloudflare-multi-club.md):
+   cuenta CF compartida con Workers for Platforms (dispatch namespace), un User Worker por club
+   con su D1 adjuntada por binding. Matiza ADR-0006 (global NORMAI) para el caso de productos
+   enlatados multi-tenant; ADR-0006 sigue vigente sin cambios para proyectos bespoke.
 2. **Nombre comercial y marca del producto.** Enlatado necesita nombre propio, distinto de NORMAI.
 3. **Alcance del piloto**: construir los 3 modulos antes del primer club, o salir con Turnos + Caja
    y vender Torneos como la segunda etapa. La segunda opcion adelanta ingreso pero compite peor

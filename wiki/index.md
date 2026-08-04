@@ -1,7 +1,6 @@
 # Wiki - erp-padel
 # Mantenido por el agente. Modificaciones humanas: agregar bajo ## Inbox.
-# Ultima actualizacion: 2026-07-29 (creacion del proyecto + propuesta borrador 2 con Modulo 4 +
-# entregable para cliente + repo propio)
+# Ultima actualizacion: 2026-08-04 (corrida e2e del Modulo 1 - Reserva de cancha, cerrada)
 
 ## Que es
 
@@ -9,8 +8,21 @@ Producto enlatado de gestion para clubes de padel, desplegable por club: turnos,
 contabilidad y precio por demanda en una sola base. Compite contra Clubo, CanchaFija y PadelCRM,
 que cobran suscripcion mensual fija sin comision por partido.
 
-**Estado: idea con propuesta escrita. Sin cliente, sin repo, sin codigo.** No se construye nada
-hasta resolver las decisiones pendientes de la propuesta (Parte 2) y tener 2 clubes comprometidos.
+**Estado: idea con propuesta escrita, mas una implementacion de referencia del Modulo 1. Sin
+cliente.** El repo propio y su remoto ya existen (ver Identidad del proyecto). No se construye
+nada COMERCIAL hasta resolver las decisiones pendientes de la propuesta (Parte 2) y tener 2 clubes
+comprometidos.
+
+**Corrida de referencia cerrada (2026-08-04):** Modulo 1 (Reserva de cancha) construido de punta a
+punta por la suite completa de agentes, como ejercicio tecnico confirmado por el humano -- no es el
+disparador comercial de "2 clubes comprometidos". Codigo, schema, specs y plan de staging viven en
+`.claude/worktrees/reserva-cancha` (rama `worktree-reserva-cancha`, 4 commits locales sin
+pushear, sin mergear a `main`). Veredictos: QA SHIP CON FIXES (fixes aplicados), security-reviewer
+blocker cerrado (2 warnings abiertos), ux-reviewer LISTO PARA STAGING. Nada desplegado, sin
+recursos CF creados o modificados -- devops solo dejo un plan de staging
+(`.claude/worktrees/reserva-cancha/wiki/architecture/plan-staging.md`) porque encontro que
+Workers for Platforms (la arquitectura de ADR-0001) todavia no esta comprado en la cuenta CF real.
+Auditoria completa, orden de agentes, friccion y tiempos: [corrida-e2e.md](./corrida-e2e.md).
 
 ## Identidad del proyecto
 
@@ -18,7 +30,9 @@ hasta resolver las decisiones pendientes de la propuesta (Parte 2) y tener 2 clu
 - Slug: erp-padel
 - Nombre comercial: a definir (decision pendiente 2)
 - Repositorio: repo propio (proyecto fuera del repo normai, como el resto de projects/). Remoto en
-  GitHub: pendiente de crear
+  GitHub: git@github.com:Tizianobollano/erp-padel.git (existe, rama main al dia). Creado y
+  pusheado por el humano a mano despues del 2026-07-29 (la wiki no lo tenia registrado hasta el
+  2026-08-04, ver log.md)
 - URL produccion: no desplegado
 
 ## Documentos
@@ -61,18 +75,21 @@ clubes el producto no cierra). Techo de precio del mercado: ~$45.000/mes por clu
 
 ## Decisiones tomadas
 
-Ninguna registrada. Ver ./wiki/decisions/ (vacio).
+1. [0001-modelo-cuentas-cloudflare-multi-club.md](./decisions/0001-modelo-cuentas-cloudflare-multi-club.md)
+   (2026-08-04): cuenta Cloudflare compartida con Workers for Platforms (dispatch namespace, un
+   User Worker por club con D1 propia adjuntada por binding), no una cuenta por club. Matiza
+   ADR-0006 global (que sigue vigente para proyectos bespoke) para el caso de productos enlatados
+   multi-tenant de NORMAI. Gap abierto: costo mensual propio de Workers for Platforms mas alla del
+   Workers Paid de $5/mes, sin verificar contra el dashboard.
 
 ## Decisiones pendientes
 
 Detalle y opciones en propuesta.md Parte 2:
 
-1. Modelo de cuentas Cloudflare para producto de ticket bajo (matiza o contradice el ADR-0006
-   global: una cuenta por cliente en produccion)
-2. Nombre comercial y marca del producto
-3. Alcance del piloto: 3 modulos completos, o Turnos + Caja primero
-4. Ventana de soporte comprometida (el riesgo economico principal, no el precio)
-5. Empaquetado del Modulo 4 (precio por demanda): adicional sobre plan Club, o tercer plan que lo
+1. Nombre comercial y marca del producto
+2. Alcance del piloto: 3 modulos completos, o Turnos + Caja primero
+3. Ventana de soporte comprometida (el riesgo economico principal, no el precio)
+4. Empaquetado del Modulo 4 (precio por demanda): adicional sobre plan Club, o tercer plan que lo
    incluya
 
 ## Gaps
@@ -89,8 +106,16 @@ Detalle y opciones en propuesta.md Parte 2:
       por cancha-hora, solo el mecanismo para medirlo despues
 - [ ] Inversion de construccion sin estimar en horas: la tabla de recupero usa tres escenarios
       hipoteticos
-- [ ] Modelo de datos en borrador, sin pasar por database-architect
+- [x] Modelo de datos en borrador, sin pasar por database-architect -- resuelto 2026-08-04 para el
+      Modulo 1 (canchas/horarios/reservas, ver corrida-e2e.md). Sigue en borrador para los demas
+      modulos (torneos, contabilidad, precio por demanda)
 - [ ] Sin relevar que hardware tienen realmente los clubes objetivo en el mostrador
+- [ ] Rate limiting del formulario publico y headers de seguridad (CSP/X-Frame-Options): estaban
+      en el stack planeado desde el borrador 1 pero el Modulo 1 se construyo sin ellos
+      (security-reviewer los dejo como WARNING, no BLOCKER, ver corrida-e2e.md)
+- [ ] Workers for Platforms (arquitectura elegida en ADR-0001) no esta comprado/habilitado en la
+      cuenta Cloudflare real -- alta de producto en el dashboard, pendiente del humano, antes de
+      poder ejecutar el plan de staging
 
 ## Inbox
 <!-- Humano: deja notas aqui para la proxima sesion -->
