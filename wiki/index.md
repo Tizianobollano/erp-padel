@@ -20,7 +20,7 @@ disparador comercial de "2 clubes comprometidos". Codigo, schema, specs y plan d
 Veredictos: QA SHIP CON FIXES (fixes aplicados), security-reviewer
 blocker cerrado (2 warnings abiertos), ux-reviewer LISTO PARA STAGING. Nada desplegado, sin
 recursos CF creados o modificados -- devops solo dejo un plan de staging
-(`wiki/architecture/plan-staging.md`) porque encontro que
+([architecture/plan-staging.md](./architecture/plan-staging.md)) porque encontro que
 Workers for Platforms (la arquitectura de ADR-0001) todavia no esta comprado en la cuenta CF real.
 Auditoria completa, orden de agentes, friccion y tiempos: [corrida-e2e.md](./corrida-e2e.md).
 

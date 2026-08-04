@@ -730,3 +730,54 @@ orden de agentes, entregables, friccion y tiempos reales: corrida-e2e.md. Codigo
 plan de staging quedan en `.claude/worktrees/reserva-cancha` (rama `worktree-reserva-cancha`), sin
 mergear a main, sin pushear. Commit de esta sesion en el checkout principal (reconciliacion +
 ADR-0001 + cierre) preparado y pendiente de confirmacion humana, no ejecutado.
+
+
+[2026-08-04] devops: plan de staging del Modulo 1, sin ejecutar nada contra la cuenta CF real
+(restriccion explicita del humano para esta pasada -- solo planificacion). Documento completo en
+`wiki/architecture/plan-staging.md`.
+
+Verificado por lectura contra la cuenta real (MCP cloudflare, solo GET/list, cero escritura):
+cuenta `1a5f93adc916c9642a1d1807032bde4a`. **Hallazgo bloqueante no anticipado por ADR-0001**:
+`GET /accounts/.../workers/dispatch/namespaces` devuelve error 10121, "no tenes acceso a dispatch
+namespaces, comaralo desde el dashboard" -- Workers for Platforms no esta habilitado/comprado en
+esta cuenta. No aparece en `/subscriptions` (que si lista Workers Paid $5/mes activo, R2 Paid y
+Teams Free Base). Esto no es solo el gap que ADR-0001 dejo abierto ("cuanto sale W4P mas alla de
+Workers Paid") -- es mas grave: ni siquiera esta contratado, y habilitarlo es un alta de producto
+en el dashboard que el humano tiene que hacer, no un comando de wrangler ni una llamada de API de
+devops. Bloquea el primer paso ejecutable del plan.
+
+Tambien verificado por lectura (resuelve incognitas del plan sin adivinar): Zero Trust ya existe a
+nivel cuenta compartida (org "IIAPIE", team domain `minerva-setter.cloudflareaccess.com`, Teams
+Free Base 50 usuarios) -- erp-padel suma una app nueva a ese team, mismo patron que las apps de
+gestoria/afolap ya creadas, no hace falta team nuevo. Subdominio de Workers de la cuenta:
+`minerva-setter.workers.dev` (confirmado via `/workers/subdomain`), sirve de URL publica temporal
+de staging mientras no haya dominio propio (gap ya conocido, sin zona de erp-padel entre las 4 de
+la cuenta). Sin D1 ni Worker de erp-padel creados todavia (13 D1 y 17 Workers en la cuenta, ninguno
+de este proyecto).
+
+Plan documentado, en orden: 1) habilitar W4P (humano, dashboard, bloqueante) 2) dispatch namespace
+`erp-padel-staging` 3) D1 `erp-padel-club-piloto-staging` (convencion de nombre para Oleada 8:
+`<proyecto>-<club>-<entorno>`) 4) migraciones D1 contra esa base -- gate humano explicito aparte
+5) Worker dinamico de dispatch (`erp-padel-dispatch-staging`, pieza nueva fuera de `src/**` de
+este repo, la unica pieza publica, `wrangler deploy` normal con binding `dispatch_namespaces`)
+6) Upload del User Worker (`club-piloto`) al namespace via API (Upload Worker Module, bindings D1/
+ENVIRONMENT=staging/ACCESS_* en el metadata, no en `wrangler.jsonc`) 7) app de Cloudflare Access
+para `/panel*` reusando el team existente.
+
+Gap de tooling nuevo, no resuelto en el documento: `wrangler.jsonc` de este repo apunta a
+`src/index.tsx` (TSX) pero el Upload Worker Module pide JS ya bundleado -- falta un script de
+build propio para W4P antes de que el paso de upload sea ejecutable sin improvisar.
+
+Verificacion post-deploy especificada segun ADR-0009 (workspace global): version real que sirve
+trafico (distinto mecanismo para el Worker dinamico -- que si tiene Version ID de Wrangler -- vs
+el script dentro del namespace -- que no, se confirma por `etag`/`created_on` del GET del script),
+camino critico contra la URL publica de staging (`/health`, `/reservar` con SELECT a D1 remota,
+repetir la prueba de concurrencia de 10 requests que QA ya corrio en local pero contra D1 real,
+`/panel` sin JWT debe seguir dando 403 -- confirma que el bypass de dev no resucito por un binding
+mal subido), migraciones confirmadas contra `sqlite_master` remota, logs reales via `wrangler
+tail` durante la corrida de prueba. Sin consumidores asincronicos que verificar (modulo sin Queues/
+Cron/Durable Objects).
+
+Ningun recurso creado ni modificado en la cuenta CF. Ninguna migracion aplicada. Sin commit (el
+plan es un archivo nuevo bajo `wiki/`, pendiente del mismo criterio de confirmacion humana para
+commit que el resto de la sesion).
