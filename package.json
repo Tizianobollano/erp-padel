@@ -1,0 +1,27 @@
+{
+  "name": "erp-padel-reserva-cancha",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n css,worker -c cyan,magenta \"npm:dev:css\" \"npm:dev:worker\"",
+    "dev:css": "tailwindcss -i ./src/styles/app.css -o ./public/styles.css --watch",
+    "dev:worker": "wrangler dev --var ENVIRONMENT:development",
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -i ./src/styles/app.css -o ./public/styles.css --minify",
+    "deploy": "echo 'BLOQUEADO: el pipeline real es Workers for Platforms (wiki/decisions/0001-modelo-cuentas-cloudflare-multi-club.md). wrangler deploy directo contra este wrangler.jsonc no tiene routes ni dispatch namespace -- lo arma devops.' && exit 1",
+    "typecheck": "tsc --noEmit",
+    "db:apply:local": "wrangler d1 migrations apply reserva-cancha --local",
+    "db:apply:remote": "wrangler d1 migrations apply reserva-cancha --remote"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260722.1",
+    "@tailwindcss/cli": "^4.0.0",
+    "concurrently": "^9.0.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.6.0",
+    "wrangler": "^4.107.0"
+  }
+}

@@ -1,0 +1,138 @@
+---
+#title: ""
+#author:
+#date:
+lang: es
+format:
+    pdf:
+        papersize: a4
+        fontsize: 12pt
+        pdf-engine: pdflatex
+        colorlinks: false
+        #keep-tex: true
+        indent: true
+        tbl-cap-location: bottom
+        # fig-pos: "tbph"
+        cite-method: biblatex
+        biblio-style: apa
+        # biblatexoptions:
+        #   - backend=biber
+        include-in-header:
+          - text: |
+              \NewHook{cmd/@startsection/before}
+              \setlength{\parindent}{1.27cm}
+              \setlength{\bibhang}{1.27cm}
+              \renewcommand{\familydefault}{\ttdefault}
+              \spaceskip=0.5em plus 0.3em minus 0.2em\relax
+---
+
+# Sistema de gestion para canchas de futbol 5 y 7
+
+Turnos - Torneos - Caja y contabilidad - Precio por demanda
+
+Documento de propuesta - 2026-07-29
+
+### Modulo 1 - Turnos
+
+* **Grilla horaria** por cancha y por dia, en tiempo real, operable desde el mostrador (celular o
+  tablet) y desde la computadora.
+* **Reserva online del jugador**: link propio del club, disponible 24 horas, sin que el jugador
+  instale nada.
+* **Tarifas por franja**: precio distinto por dia y por rango horario (hora pico nocturna vs.
+  matinal), configurable por el club sin depender de nosotros.
+* **Turnos fijos y abonados**: reserva recurrente semanal con vencimiento y estado de pago.
+* **Seña obligatoria** configurable (porcentaje o monto) para confirmar el turno. Sin seña, el
+  turno queda pendiente y se libera automaticamente al vencer el plazo.
+* **Estados explicitos**: pendiente -> confirmado -> jugado / cancelado / ausente. Cada transicion
+  queda registrada con autor y fecha.
+* **Avisos al jugador**: confirmacion y recordatorio. La base incluye enlace de WhatsApp de un
+  click desde la ficha del turno y email; el envio automatico masivo es un adicional.
+
+*Instalacion: sin cargo*
+
+### Modulo 2 - Torneos
+
+* **Inscripcion online** con formulario propio del club: equipo, categoria, contacto, pago o seña
+  de inscripcion.
+* **Categorias y control de nivel** por jugador, para armar cuadros parejos.
+* **Fixture automatico**: zonas todos contra todos, clasificacion y llave de eliminacion directa,
+  con carga de resultados desde el celular.
+* **Programacion sobre la grilla**: los partidos del torneo ocupan canchas y horarios en la misma
+  grilla de turnos, sin doble reserva.
+* **Ranking del club** por puntos acumulados, publicable en el sitio del club.
+* **Resultado economico del torneo**: inscripciones, gastos (pelotas, premios, arbitraje) y neto
+  del evento, integrados a la caja.
+
+*Instalacion: sin cargo*
+
+### Modulo 3 - Caja, tienda y contabilidad
+
+Es el modulo donde el sistema se diferencia: la oferta disponible en el mercado resuelve punto de
+venta y caja diaria, y se detiene antes del cierre contable.
+
+* **Punto de venta** para cantina, pelotas, alquiler de pecheras y botines: venta rapida en tablet,
+  con o sin turno asociado.
+* **Stock** de pelotas y productos de cantina: existencias, costo de compra, alerta de minimo y
+  margen real por producto.
+* **Caja por turno de empleado**: apertura con monto inicial, movimientos, cierre con arqueo y
+  diferencia declarada. Queda registrado quien abrio y quien cerro.
+* **Ingresos clasificados por origen** (turnos / torneos / cantina / tienda / alquiler) y por medio
+  de pago (efectivo / transferencia / Mercado Pago / cuenta corriente).
+* **Egresos con categoria** (mercaderia, mantenimiento, sueldos, servicios, premios), para llegar
+  al resultado del periodo y no solo a la caja del dia.
+* **Cuentas corrientes** de jugadores y abonados: saldo a favor, deuda e historial de consumos.
+* **Informes**: ocupacion por cancha y franja, ingreso por cancha y hora, ticket promedio de
+  cantina, resultado mensual, ranking de morosos. Todo exportable a CSV o Excel.
+* **Registro de auditoria inmutable**: anulaciones de venta, turnos regalados, ajustes de stock y
+  cambios de precio quedan con autor, fecha y valor anterior.
+
+*Instalacion: sin cargo*
+
+### Modulo 4 - Precio por demanda
+
+Una hora de cancha que no se vendio no se recupera nunca. Este modulo deja de tratar al precio
+como una tabla fija y lo hace seguir a la demanda real del club, siempre dentro de los limites que
+el club define.
+
+* **Bandas fijadas por el club**: precio piso y precio techo por cancha y franja horaria. El
+  sistema nunca cotiza por fuera de esa banda. El club pone los limites; el algoritmo se mueve
+  adentro.
+* **El algoritmo lee la operacion del propio club**, no un promedio de mercado:
+  1. Ocupacion historica de esa franja en las ultimas semanas.
+  2. Ocupacion del dia a medida que se acerca: cuantas canchas quedan libres y cuanto falta.
+  3. Anticipacion de la reserva: la misma franja no vale lo mismo reservada con 10 dias que a
+     3 horas del partido.
+  4. Calendario del club: feriados, vacaciones, cierres, eventos y torneos.
+  5. Historial de cancelaciones y ausencias de esa franja.
+* **Sube en pico y baja en valle**: no es solo recargar la hora cara. La baja de ultimo momento en
+  franjas que historicamente quedan vacias es la que agrega facturacion nueva.
+* **Simulacion antes de activar**: el sistema corre las reglas sobre el historico ya cargado y
+  muestra que habria facturado el club con ese esquema. Recien despues se activa.
+* **Modo sugerencia y modo automatico**: arranca sugiriendo cambios que el club acepta o rechaza
+  uno por uno. Pasa a automatico cuando el club lo decide, no antes.
+* **Las reglas del club estan por encima del algoritmo**: precio fijo para abonados y turnos fijos,
+  franjas excluidas (escuelita, torneo), tope de variacion por semana, y precio congelado una vez
+  confirmada la reserva. A un turno ya reservado no se le sube el precio nunca.
+* **Un solo precio para el jugador**: el sitio de reservas muestra el precio vigente, sin precio
+  tachado ni contadores de urgencia.
+* **Medicion**: informe de ingreso por cancha y hora contra el periodo anterior. Es la unica cifra
+  que decide si el modulo se justifica.
+
+Las reglas son explicitas y auditables: cada cambio de precio queda registrado con el valor
+anterior, el nuevo y la regla que lo genero. El club siempre puede explicar por que una hora
+costo lo que costo.
+
+*Instalacion: sin cargo*
+
+
+## Planes
+
+Sin costo de instalacion. Sin comision por turno. Sin costo por usuario.
+
+| Plan | Incluye | Precio |
+|---|---|---|
+| **Turnos** | Modulo 1 + caja simple (ingresos por turno) | $--.--- |
+| **Club** | Modulos 1 + 2 + 3 completos | $--.--- |
+| Cancha adicional | Sobre cualquier plan | $-.--- |
+| Sede adicional | Grilla, caja y stock propios por sede | $--.--- |
+

@@ -1,0 +1,7 @@
+# Copiar a .dev.vars (gitignoreado) solo si se necesita probar el panel SIN el bypass de dev.
+# `npm run dev` ya inyecta ENVIRONMENT=development via `wrangler dev --var ENVIRONMENT:development`
+# (ver package.json) -- wrangler.jsonc NO trae ENVIRONMENT como default, a proposito (fail-closed).
+# Con ese --var el bypass de src/auth/middleware.ts entra directo como dev@local, sin tocar este
+# archivo. Solo hace falta .dev.vars si queres forzar el flujo real de Access en local:
+# ACCESS_TEAM_DOMAIN=<team>.cloudflareaccess.com
+# ACCESS_AUD=<aud tag de la app de Access>
