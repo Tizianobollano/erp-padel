@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Modulo 1 (Reserva de cancha), staging de un solo club (ADR-0001 del proyecto): el Worker se
+  // escribe igual que cualquier Worker Hono+D1 normal. El deploy final a un dispatch namespace de
+  // Workers for Platforms lo arma devops despues, sin tocar este archivo ni el codigo de src/.
+  "name": "erp-padel-reserva-cancha",
+  "main": "src/index.tsx",
+  "compatibility_date": "2026-01-01",
+  "observability": { "enabled": true },
+  // Sirve public/styles.css (Tailwind compilado por `npm run build:css`), mismo patron que
+  // wrangler.jsonc del framework base.
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  // Sin ENVIRONMENT en vars: asi el default de este archivo es fail-closed (src/auth/middleware.ts
+  // solo bypassea Access si ENVIRONMENT es "development"/"dev"). El valor local se inyecta con
+  // `--var ENVIRONMENT:development` desde `npm run dev` (ver package.json), nunca como default
+  // committeado aca. ACCESS_AUD / ACCESS_TEAM_DOMAIN se completan cuando devops monte la app de
+  // Access real (staging o produccion).
+  //
+  // workers_dev: false a proposito -- sin routes todavia (no hay dominio de staging asignado).
+  // El pipeline real es Workers for Platforms (ver wiki/decisions/0001), no `wrangler deploy`
+  // directo contra este archivo -- ver guardia en package.json "deploy". No hacer `wrangler
+  // deploy` de este Worker hasta que devops defina routes y el dispatch namespace.
+  "workers_dev": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "reserva-cancha",
+      "database_id": "<local-only>",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
