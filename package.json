@@ -10,8 +10,8 @@
     "build:css": "tailwindcss -i ./src/styles/app.css -o ./public/styles.css --minify",
     "deploy": "echo 'BLOQUEADO: el pipeline real es Workers for Platforms (wiki/decisions/0001-modelo-cuentas-cloudflare-multi-club.md). wrangler deploy directo contra este wrangler.jsonc no tiene routes ni dispatch namespace -- lo arma devops.' && exit 1",
     "typecheck": "tsc --noEmit",
-    "db:apply:local": "wrangler d1 migrations apply reserva-cancha --local",
-    "db:apply:remote": "wrangler d1 migrations apply reserva-cancha --remote"
+    "db:apply:local": "wrangler d1 migrations apply erp-padel-reserva-cancha-staging --local",
+    "db:apply:remote": "wrangler d1 migrations apply erp-padel-reserva-cancha-staging --remote"
   },
   "dependencies": {
     "hono": "^4.6.0"

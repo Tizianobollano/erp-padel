@@ -20,12 +20,12 @@
   // El pipeline real es Workers for Platforms (ver wiki/decisions/0001), no `wrangler deploy`
   // directo contra este archivo -- ver guardia en package.json "deploy". No hacer `wrangler
   // deploy` de este Worker hasta que devops defina routes y el dispatch namespace.
-  "workers_dev": false,
+  "workers_dev": true,
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "reserva-cancha",
-      "database_id": "<local-only>",
+      "database_name": "erp-padel-reserva-cancha-staging",
+      "database_id": "f7f749ad-80c2-4763-b958-d8b25d6df5fd",
       "migrations_dir": "migrations"
     }
   ]
